@@ -44,6 +44,28 @@ a{color:var(--brass)}
 .seatname{font-weight:600}
 .seatname small,.seatname i{font-weight:400;color:var(--chalk-dim)}
 .chip.ai{text-transform:none;letter-spacing:0;font-weight:500}
+input[type="text"]{background:var(--slate);color:var(--chalk);border:1px solid var(--slate-line);border-radius:6px;padding:8px 10px;font:inherit;font-size:.95rem;min-width:0;text-transform:none;letter-spacing:normal}
+.field input{margin-top:2px}
+.warn{color:var(--bad)}
+.codebox{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;background:var(--slate);border:1px solid var(--slate-line);border-radius:12px;padding:12px 14px}
+.code{font-family:var(--f-display);font-size:2rem;letter-spacing:.18em;color:var(--brass);line-height:1.1}
+.invite{flex:1 1 240px;min-width:0}
+.linkrow{display:flex;gap:6px;margin-top:4px}
+.linkrow input{flex:1;min-width:0;font-size:.8rem}
+.lobby{display:flex;flex-direction:column;gap:6px}
+.lobbyrow{display:grid;grid-template-columns:minmax(70px,.8fr) minmax(0,1.4fr) minmax(0,2fr);gap:8px;align-items:center;padding:8px 10px;border:1px solid #ffffff1a;border-radius:10px;background:#ffffff06}
+.lobbyrow.mine{border-color:var(--brass)}
+.lobbyrow .compass{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+.lobbyrow .who{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.lobbyrow .who small{font-weight:400;color:var(--chalk-dim)}
+.lobbyrow .ctl{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.lobbyrow .ctl select{min-width:0;flex:1 1 110px}
+.lobby-ai{font-size:.8rem;color:var(--chalk-dim)}
+.online{color:var(--good);font-size:.85rem}.offline{color:var(--bad);font-size:.85rem}
+.chip.offline{color:var(--bad);border-color:var(--bad)}
+.netbanner{font-size:.85rem;color:var(--chalk-dim);border:1px solid var(--slate-line);border-radius:8px;padding:6px 10px}
+.netbanner.warn{color:#24180c;background:var(--bad);border-color:var(--bad);font-weight:600}
+@media (max-width:560px){.lobbyrow{grid-template-columns:1fr;}.lobbyrow .ctl{justify-content:flex-start}}
 .menu-row{display:flex;gap:10px;flex-wrap:wrap}
 .menu-row .btn{flex:1 1 140px}
 .langtoggle{display:inline-flex;border:1px solid var(--brass-dim);border-radius:8px;overflow:hidden}

@@ -3,20 +3,24 @@ import { createGame, applyAction, waitingFor } from './engine/game.js';
 import { requestAiAction } from './ai/client.js';
 import { loadJSON, saveJSON } from './prefs.js';
 
-const SAVE_KEY = 'boomwies-game';
+export const SOLO_SAVE = 'boomwies-game';
+export const HOST_SAVE = 'boomwies-host';
 export const SPEED = { slow: [1000, 1700], normal: [600, 1100], fast: [250, 600] };
 
 export class Controller {
-  constructor(onChange) {
+  /** extra(): additional data stored with the save (e.g. the hosted table's lobby). */
+  constructor(onChange, { saveKey = SOLO_SAVE, extra = null } = {}) {
     this.onChange = onChange;
+    this.saveKey = saveKey;
+    this.extra = extra;
     this.G = null;
     this.speed = 'normal';
     this.timer = null;
     this.version = 0;
   }
 
-  static savedGame() {
-    const s = loadJSON(SAVE_KEY);
+  static savedGame(key = SOLO_SAVE) {
+    const s = loadJSON(key);
     return s && s.G && s.G.phase !== 'over' ? s : null;
   }
 
@@ -27,7 +31,7 @@ export class Controller {
   }
 
   resume() {
-    const s = Controller.savedGame();
+    const s = Controller.savedGame(this.saveKey);
     if (!s) return false;
     this.G = s.G;
     this.speed = s.speed || 'normal';
@@ -46,7 +50,7 @@ export class Controller {
 
   afterChange() {
     this.version++;
-    saveJSON(SAVE_KEY, this.G.phase === 'over' ? null : { G: this.G, speed: this.speed });
+    saveJSON(this.saveKey, this.G.phase === 'over' ? null : { G: this.G, speed: this.speed, ...(this.extra ? this.extra() : {}) });
     this.schedule();
     this.onChange(this.G);
   }

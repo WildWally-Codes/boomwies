@@ -41,9 +41,10 @@ function nameplate(G, fmt, p) {
   const ai = pl.kind === 'ai' && pl.ai
     ? `<span class="chip ai" title="${esc(t('setup.level') + ': ' + t('level.' + pl.ai.level) + ' · ' + t('setup.aggression') + ': ' + t('aggr.' + pl.ai.aggression))}">${t('level.' + pl.ai.level)} · ${t('aggr.' + pl.ai.aggression)}</span>`
     : '';
+  const off = pl.offline ? `<span class="chip offline">${t(pl.kind === 'ai' ? 'chip.computerSub' : 'chip.offline')}</span>` : '';
   return `<div class="nameplate${turn ? ' turn' : ''}"><span class="nm">${fmt.name(p)}</span>` +
     (p === G.dealer ? `<span class="chip dealer">${t('chip.dealer')}</span>` : '') + team + roleChip(G, fmt, p) +
-    (showTricks ? `<span class="tricks">${tr === 1 ? t('tricks.1') : t('tricks.n', { n: tr })}</span>` : '') + ai + '</div>';
+    (showTricks ? `<span class="tricks">${tr === 1 ? t('tricks.1') : t('tricks.n', { n: tr })}</span>` : '') + (pl.offline ? '' : ai) + off + '</div>';
 }
 
 const bubble = (G, fmt, p) => (BIDDING.includes(G.hand.phase) ? fmt.bidLabel(G.hand.bids[p]) : '');
@@ -153,6 +154,7 @@ function renderBar(G, fmt, viewer) {
   } else if (H.phase === 'redeal') say = t('bar.redeal');
   else if (H.phase === 'trickDone') { const w = winnerOf(H.trick, H.trump); say = t('bar.takes', { who: `<b>${fmt.name(w)}</b>`, you: fmt.you(w) }); }
   else if (H.phase === 'handOver') { say = fmt.resultLine(); opts = optBtn('summary', t('btn.seeScore')); }
+  else if (H.turn >= 0 && G.players[H.turn].offline && G.players[H.turn].kind !== 'ai') say = t('bar.waitingFor', { who: fmt.name(H.turn) });
   else if (H.turn >= 0) {
     const key = H.phase === 'bid' ? 'bar.bidding' : H.phase === 'trump' ? 'bar.choosing' : H.phase === 'alone' ? 'bar.deciding' : 'bar.thinking';
     say = t(key, { who: fmt.name(H.turn) });

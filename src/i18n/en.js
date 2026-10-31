@@ -1,0 +1,219 @@
+export default {
+  'app.title': 'Wiezen & Boomkewies',
+  'app.tag': 'Belgian whist at the café table',
+  'you': 'You',
+
+  'suit.0': 'Spades', 'suit.1': 'Hearts', 'suit.2': 'Diamonds', 'suit.3': 'Clubs',
+  'rank.11': 'J', 'rank.12': 'Q', 'rank.13': 'K', 'rank.14': 'A',
+  'rankName.11': 'Jack', 'rankName.12': 'Queen', 'rankName.13': 'King', 'rankName.14': 'Ace',
+  'cardAria': '{rank} of {suit}',
+
+  'mode.wiezen': 'Wiezen',
+  'mode.boomke': 'Boomkewies',
+  'mode.klassiek': 'Classic Boomke',
+  'modeDesc.wiezen': 'Vraag & mee, abondance, miserie, troel, solo. Partners change every deal.',
+  'modeDesc.boomke': 'Fixed teams. Bid 7 to 13 tricks; the first card led sets trump.',
+  'modeDesc.klassiek': 'No bidding. The turned card is trump, one point per trick.',
+  'modeSub.wiezen': 'Wiezen · every player for themselves',
+  'modeSub.boomke': 'Boomkewies · {a} vs {b}',
+  'modeSub.klassiek': 'Classic Boomke · a point per trick',
+
+  'menu.solo': 'Play solo',
+  'menu.soloDesc': 'You against three computer players.',
+  'menu.host': 'Host a table',
+  'menu.join': 'Join a table',
+  'menu.soon': 'Coming soon',
+  'menu.resume': 'Resume game',
+  'menu.rules': 'Rules',
+  'menu.settings': 'Settings',
+  'menu.language': 'Language',
+
+  'btn.lastTrick': 'Last trick',
+  'btn.rules': 'Rules',
+  'btn.menu': 'Menu',
+  'btn.settings': 'Settings',
+  'btn.close': 'Close',
+  'btn.back': 'Back',
+  'btn.start': 'Deal the cards',
+  'btn.next': 'Next deal',
+  'btn.final': 'Final result',
+  'btn.lookTable': 'Look at the table',
+  'btn.seeScore': 'See score',
+  'btn.playAgain': 'Play again',
+  'btn.sort': 'Sort',
+  'btn.backToGame': 'Back to game',
+
+  'setup.title': 'Take a seat',
+  'setup.intro': 'You sit South. Jef, Mieke and Rik are played by the computer.',
+  'setup.deals': 'Deals',
+  'setup.endless': 'Endless',
+  'setup.speed': 'Computer speed',
+  'speed.slow': 'Slow', 'speed.normal': 'Normal', 'speed.fast': 'Fast',
+
+  'settings.title': 'Settings',
+  'settings.sortDir': 'Card order within a suit',
+  'settings.asc': 'Low to high (2 … A)',
+  'settings.desc': 'High to low (A … 2)',
+  'settings.trumpFirst': 'Put trump on the left once it is known',
+  'settings.dragHint': 'Drag cards to rearrange your hand. Sort puts them back in order.',
+
+  'chip.dealer': 'Dealer',
+  'chip.partner': 'Partner',
+  'chip.troelPartner': 'Troel partner',
+  'chip.team': 'Team {x}',
+  'tricks.n': '{n} tricks',
+  'tricks.1': '1 trick',
+
+  'bid.pass': 'Pass',
+  'bid.vraag': 'Vraag',
+  'bid.mee': 'Mee',
+  'bid.alleen': 'Alleen',
+  'bid.troel': 'Troel!',
+  'bid.troela': 'Troela!',
+  'bid.partner': 'Partner',
+  'bid.abon9': 'Abondance 9', 'bid.abon10': 'Abondance 10', 'bid.abon11': 'Abondance 11', 'bid.abon12': 'Abondance 12',
+  'bid.miserie': 'Miserie',
+  'bid.openmis': 'Open miserie',
+  'bid.solo': 'Solo',
+  'bid.soloslim': 'Solo slim',
+  'bid.meetje': 'Meetje',
+  'bid.boom': 'Boom',
+  'hint.vraag': 'ask a partner · 8 tricks together',
+  'hint.mee': 'join the asker · 8 tricks together',
+  'hint.abon9': 'alone · 9 tricks · own trump',
+  'hint.abon10': 'alone · 10 tricks · own trump',
+  'hint.abon11': 'alone · 11 tricks · own trump',
+  'hint.abon12': 'alone · 12 tricks · own trump',
+  'hint.miserie': 'alone · take no tricks · no trump',
+  'hint.openmis': 'no tricks · hand shown after trick 1',
+  'hint.solo': 'alone · all 13 · own trump',
+  'hint.soloslim': 'alone · all 13 · turned trump',
+  'hint.boom': 'all 13',
+  'hint.meetje': '7 tricks wins 1, no risk',
+  'hint.alleen': '5 tricks against three',
+
+  'contract.vraag': 'Vraag & mee',
+  'contract.alleen': 'Alleen',
+  'contract.troel': 'Troel',
+  'contract.troela': 'Troela',
+  'contract.meetje': 'Meetje',
+  'contract.boom': 'Boom',
+  'contract.bid': 'Bid {n}',
+  'contract.klassiek': 'Classic deal',
+
+  'status.deal': 'Deal {n}',
+  'status.dealOf': 'Deal {n} of {m}',
+  'status.progress': '{who}: {contract} · {t} taken, need {goal}',
+  'status.goalTricks': '{n} tricks',
+  'status.goalNone': 'no tricks',
+  'status.trump': '{suit} trump',
+  'mid.turned': 'Turned',
+  'mid.trump': 'Trump',
+  'mid.byLead': 'set by first lead',
+  'mid.noTrump': 'No trump',
+
+  'bar.yourBid': 'Your bid.',
+  'bar.noBidYet': 'Nobody has bid yet.',
+  'bar.current': 'Current: {bid} by {who}.',
+  'bar.currentPair': 'Current: Vraag by {who} + {partner}.',
+  'bar.dealerForced': 'Everyone passed. As dealer you must bid 7, Boom, or call a Meetje.',
+  'bar.highest': 'Highest: {n} by {who}.',
+  'bar.highestPartner': 'Highest: {n} by {who} (your partner).',
+  'bar.boomkeIntro': 'Bids are tricks for your team (7–13).',
+  'bar.noJoin': 'Nobody joined your vraag. Play alone for 5 tricks, or pass and redeal?',
+  'bar.chooseTrump': 'Choose trump for your {contract}.',
+  'bar.leadSetsTrump': 'Your lead sets trump. Play a card from the suit you want as trump.',
+  'bar.yourLead': 'Your lead. Play any card.',
+  'bar.follow': 'Your turn. Follow {suit}.',
+  'bar.noSuit': 'Your turn. You have no {suit}: play any card.',
+  'bar.redeal': 'Everyone passed. Shuffling for a new deal…',
+  'bar.takes': '{who} takes the trick.',
+  'bar.takes.you': 'You take the trick.',
+  'bar.bidding': '{who} is bidding…',
+  'bar.choosing': '{who} is choosing trump…',
+  'bar.deciding': '{who} is deciding…',
+  'bar.thinking': '{who} is thinking…',
+
+  'ev.deal': 'Deal {n}: {who} deals.',
+  'ev.deal.you': 'Deal {n}: you deal.',
+  'ev.turned': 'Turned card {card}: {suit} would be trump.',
+  'ev.turnedTrump': 'Turned card {card}: trump is {suit}.',
+  'ev.troel': '{who} has {n} aces: {name}! Partner is {partner} (holds {card}), trump {suit}.',
+  'ev.troel.you': 'You have {n} aces: {name}! Partner is {partner} (holds {card}), trump {suit}.',
+  'ev.pass': '{who} passes.', 'ev.pass.you': 'You pass.',
+  'ev.vraag': '{who} asks (vraag).', 'ev.vraag.you': 'You ask (vraag).',
+  'ev.mee': '{who} joins {other} (mee).', 'ev.mee.you': 'You join {other} (mee).',
+  'ev.bid': '{who} bids {bid}.', 'ev.bid.you': 'You bid {bid}.',
+  'ev.meetje': '{who} calls a Meetje.', 'ev.meetje.you': 'You call a Meetje.',
+  'ev.allPass': 'Everyone passed. The cards are dealt again.',
+  'ev.noJoin': 'Nobody joins {who}.', 'ev.noJoin.you': 'Nobody joins you.',
+  'ev.alone': '{who} plays alone for 5 tricks.', 'ev.alone.you': 'You play alone for 5 tricks.',
+  'ev.aloneNo': '{who} passes too. The cards are dealt again.', 'ev.aloneNo.you': 'You pass too. The cards are dealt again.',
+  'ev.trump': '{who} picks {suit} as trump.', 'ev.trump.you': 'You pick {suit} as trump.',
+  'ev.leadTrump': '{who} leads {card}: trump is {suit}.', 'ev.leadTrump.you': 'You lead {card}: trump is {suit}.',
+  'ev.contractB': '{team} must take {n} tricks. {who} leads; the first card sets trump.',
+  'ev.contractMeetje': 'Meetje: {who} leads and the first card sets trump.',
+  'ev.reveal': '{who} lays the open miserie hand on the table.', 'ev.reveal.you': 'Your open miserie hand is on the table.',
+
+  'res.made': '{who} made {contract} ({t} tricks, needed {goal}).',
+  'res.failed': '{who} went down in {contract} ({t} tricks, needed {goal}).',
+  'res.made.pl': '{who} made {contract} ({t} tricks, needed {goal}).',
+  'res.failed.pl': '{who} went down in {contract} ({t} tricks, needed {goal}).',
+  'res.meetje': '{team} win the Meetje (+1).',
+  'res.klassiek': 'Tricks: {a} {x}, {b} {y}.',
+  'sum.title': 'Deal {n}',
+  'sum.tricks': 'Tricks',
+  'sum.points': 'Points this deal',
+  'sum.total': 'Running total',
+  'sum.verdictMade': '{who} made {contract}.',
+  'sum.verdictFailed': '{who} failed {contract}.',
+  'sum.klassiekUs': 'Your team took the most tricks.',
+  'sum.klassiekThem': '{team} took the most tricks.',
+  'sum.klassiekTie': 'The tricks are shared evenly.',
+
+  'over.title': 'Final score',
+  'over.tie': 'A tie between {names}.',
+  'over.youWin': 'You win the evening.',
+  'over.teamWin': 'Your team wins the evening.',
+  'over.otherWins': '{who} wins the evening.',
+  'over.otherTeamWins': '{who} win the evening.',
+
+  'score.title': 'Score sheet',
+  'score.deal': 'Deal',
+  'score.total': 'Total',
+  'score.empty': 'No deals scored yet.',
+  'log.title': 'At the table',
+  'last.title': 'Last trick',
+  'last.took': '{who} took it.',
+  'last.took.you': 'You took it.',
+  'and': '&',
+
+  'rules.html': `
+  <p>Both games use a 52-card pack, ace high, dealt 4-4-5 clockwise. You must follow suit if you can; otherwise you may play anything, and you never have to trump or overtake. The highest trump wins the trick, or else the highest card of the suit led.</p>
+  <h3>Wiezen</h3>
+  <p>No fixed partners. The dealer's last card is turned up and its suit is the normal trump. The player left of the dealer bids first; bidding goes round until everyone except the current bidder (and partner) has passed. A player who passes is out of the auction.</p>
+  <ul>
+    <li><b>Vraag / Mee</b>: ask for a partner; one other player may join. Together you need 8 tricks in the turned trump. If nobody joins, the asker plays <b>alleen</b> for 5 tricks or passes.</li>
+    <li><b>Troel</b>: three aces are announced automatically. The holder of the fourth ace is the partner and that suit is trump; 8 tricks needed. With four aces (<b>troela</b>) hearts are trump, the holder of the highest missing heart is the partner, and 9 tricks are needed.</li>
+    <li><b>Abondance 9–12</b>: alone, pick your own trump. <b>Miserie</b>: alone, no tricks, no trump. <b>Open miserie</b>: the same, but your hand is shown after the first trick. <b>Solo</b>: all 13 with your trump. <b>Solo slim</b>: all 13 in the turned trump; solo players lead.</li>
+    <li>If everyone passes, the same dealer deals again.</li>
+  </ul>
+  <div class="tblwrap"><table class="ref"><tr><th>Contract (bid order, low to high)</th><th>Made</th><th>Failed</th></tr>
+    <tr><td>Vraag &amp; mee (8, team)</td><td>2 each, +1 per extra trick, 10 for all 13</td><td>−2, −1 per missing trick</td></tr>
+    <tr><td>Alleen (5)</td><td>2, +1 per extra trick</td><td>−2, −1 per missing trick</td></tr>
+    <tr><td>Troel / troela (team)</td><td>4 each, +2 per extra trick, 20 for all 13</td><td>−4, −2 per missing trick</td></tr>
+    <tr><td>Abondance 9 / 10 / 11 / 12</td><td>5 / 7 / 8 / 9, +1 per extra trick</td><td>same value lost</td></tr>
+    <tr><td>Miserie · Open miserie</td><td>7 · 14</td><td>−7 · −14</td></tr>
+    <tr><td>Solo · Solo slim</td><td>25 · 30</td><td>−25 · −30</td></tr></table></div>
+  <p>Solo contracts (alleen, abondance, miserie, solo) are paid by each of the three opponents, so the soloist wins or loses three times the value. In team contracts each partner wins the value and each opponent pays it. Miserie and solo deals stop as soon as they are decided.</p>
+  <h3>Boomkewies</h3>
+  <p>Fixed teams: South and North against West and East. Bids are a number of tricks for your team, 7 to 13 (13 is <b>Boom</b>); no suit is named. Each bid must be higher, and a player who passes is out. The highest bidder leads, and the suit of that first card becomes trump. If the first three players pass, the dealer must bid 7, Boom, or call a <b>Meetje</b>: the dealer leads to set trump and whichever team takes 7 tricks scores 1.</p>
+  <div class="tblwrap"><table class="ref"><tr><th>Bid</th><th>Made (bidders)</th><th>Failed</th></tr>
+    <tr><td>7, 8, 9</td><td>+1 for 7–9 tricks, +2 for 10–12, +3 for 13</td><td>bidders −1; opponents +1, or +2 if they took 10+</td></tr>
+    <tr><td>10, 11, 12</td><td>+2, or +3 for 13</td><td>bidders −2, opponents +2</td></tr>
+    <tr><td>Boom (13)</td><td>+5</td><td>bidders −5, opponents +5; play stops at the first lost trick</td></tr></table></div>
+  <h3>Classic Boomke</h3>
+  <p>No bidding: the turned card sets trump, the player left of the dealer leads, and each team scores one point per trick.</p>
+  <h3>Sources</h3>
+  <p>Boomkewies follows <a href="https://www.pagat.com/auctionwhist/boomke-wies.html" target="_blank" rel="noopener">pagat.com</a>. Wiezen scoring follows <a href="https://www.thegameroom.org/wiezen/" target="_blank" rel="noopener">thegameroom.org</a>; where that page gives no number (failed contracts, the bid order) common café values are used. Piccolo, tremerie, kleine miserie with discards and shared miserie are not included.</p>`
+};

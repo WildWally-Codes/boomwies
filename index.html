@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Wiezen &amp; Boomkewies</title>
+  <meta name="description" content="Belgian whist card games Wiezen and Boomkewies, against the computer or with friends.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600;700&family=Caveat:wght@500;700&display=swap">
+  <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+  <!-- Main menu -->
+  <section class="menu" id="menu" hidden>
+    <div class="menu-inner">
+      <div class="menu-top">
+        <div class="langtoggle" id="langMenu" role="group" aria-label="Language"></div>
+      </div>
+      <h1 class="menu-title" data-i18n="app.title"></h1>
+      <p class="menu-tag" data-i18n="app.tag"></p>
+      <div class="menu-body" id="menuBody"></div>
+    </div>
+  </section>
+
+  <!-- Game table -->
+  <div class="app" id="game" hidden>
+    <header class="top">
+      <div class="brand"><span data-i18n="app.title"></span><small id="sub"></small></div>
+      <div class="tools">
+        <button class="btn" id="bLast" type="button" data-i18n="btn.lastTrick"></button>
+        <button class="btn" id="bRules" type="button" data-i18n="btn.rules"></button>
+        <button class="btn" id="bSettings" type="button" data-i18n="btn.settings"></button>
+        <button class="btn" id="bMenu" type="button" data-i18n="btn.menu"></button>
+      </div>
+    </header>
+    <main class="table">
+      <div class="status" id="status"></div>
+      <div class="mat">
+        <div class="seat n" id="pos2"></div>
+        <div class="seat w" id="pos1"></div>
+        <div class="center" id="center"></div>
+        <div class="seat e" id="pos3"></div>
+      </div>
+      <div class="bar" id="bar"></div>
+      <div class="me" id="pos0"></div>
+    </main>
+    <aside class="side">
+      <section class="slate"><h2 data-i18n="score.title"></h2><div class="scorewrap" id="score"></div></section>
+      <section class="slate"><h2 data-i18n="log.title"></h2><ul class="log" id="log"></ul></section>
+    </aside>
+  </div>
+
+  <div class="veil" id="veil" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

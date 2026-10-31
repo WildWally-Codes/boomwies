@@ -5,6 +5,7 @@ import { HandOrder, attachDrag } from './ui/hand.js';
 import { renderTable, cardHTML } from './ui/table.js';
 import { makeFmt } from './ui/format.js';
 import { applyAction } from './engine/game.js';
+import { LEVELS, AGGRESSION } from './ai/config.js';
 
 const $ = id => document.getElementById(id);
 const AI_NAMES = ['Jef', 'Mieke', 'Rik'];
@@ -60,6 +61,9 @@ function renderMenu() {
       <h2 class="sheet-h">${t('setup.title')}</h2>
       <p class="menu-tag" style="text-transform:none;letter-spacing:0;font-size:.9rem">${t('setup.intro')}</p>
       <div class="choices">${ch('wiezen')}${ch('boomke')}${ch('klassiek')}</div>
+      <h3 class="menu-h3">${t('setup.opponents')}</h3>
+      ${seatTable()}
+      <p class="hint">${t('aggrDesc')}</p>
       <div class="row">
         <label for="selDeals">${t('setup.deals')}<select id="selDeals">${[4, 8, 12, 16, 0].map(v => `<option value="${v}"${v === prefs.maxDeals ? ' selected' : ''}>${v || t('setup.endless')}</option>`).join('')}</select></label>
         <label for="selSpeed">${t('setup.speed')}<select id="selSpeed">${['slow', 'normal', 'fast'].map(v => `<option value="${v}"${v === prefs.speed ? ' selected' : ''}>${t('speed.' + v)}</option>`).join('')}</select></label>
@@ -70,6 +74,35 @@ function renderMenu() {
   }
 }
 
+function seatTable() {
+  const opt = (list, prefix, sel) => list.map(v => `<option value="${v}"${v === sel ? ' selected' : ''}>${t(prefix + v)}</option>`).join('');
+  const same = k => prefs.aiSeats.every(s => s[k] === prefs.aiSeats[0][k]) ? prefs.aiSeats[0][k] : '';
+  const row = (label, i, lvl, agg, extra = '') => `<div class="seatrow">
+      <span class="seatname">${label}${extra}</span>
+      <select id="lvl${i}" data-seat="${i}" data-k="level" aria-label="${t('setup.level')}">${i === 'all' && !lvl ? '<option value="" selected>—</option>' : ''}${opt(LEVELS, 'level.', lvl)}</select>
+      <select id="agg${i}" data-seat="${i}" data-k="aggression" aria-label="${t('setup.aggression')}">${i === 'all' && !agg ? '<option value="" selected>—</option>' : ''}${opt(AGGRESSION, 'aggr.', agg)}</select>
+    </div>`;
+  return `<div class="seats">
+    <div class="seatrow head"><span></span><span>${t('setup.level')}</span><span>${t('setup.aggression')}</span></div>
+    ${AI_NAMES.map((n, i) => row(n, i, prefs.aiSeats[i].level, prefs.aiSeats[i].aggression,
+      prefs.mode !== 'wiezen' && i === 1 ? ` <small>(${t('setup.partner')})</small>` : '')).join('')}
+    ${row(`<i>${t('setup.allSeats')}</i>`, 'all', same('level'), same('aggression'))}
+    <p class="hint" id="lvlDesc">${AI_NAMES.map((n, i) => `${n}: ${t('levelDesc.' + prefs.aiSeats[i].level)}`).join(' · ')}</p>
+  </div>`;
+}
+
+$('menu').addEventListener('change', e => {
+  const sel = e.target.closest('select[data-seat]');
+  if (!sel || !sel.value) return;
+  const seats = prefs.aiSeats.map(s => ({ ...s })), k = sel.dataset.k;
+  if (sel.dataset.seat === 'all') seats.forEach(s => (s[k] = sel.value));
+  else seats[+sel.dataset.seat][k] = sel.value;
+  const deals = $('selDeals').value, speed = $('selSpeed').value;
+  savePrefs({ aiSeats: seats, maxDeals: +deals, speed });
+  renderMenu();
+  $(sel.id)?.focus();
+});
+
 $('menu').addEventListener('click', e => {
   const langBtn = e.target.closest('[data-lang]');
   if (langBtn) return changeLang(langBtn.dataset.lang);
@@ -78,7 +111,7 @@ $('menu').addEventListener('click', e => {
   const act = a.dataset.act;
   if (act === 'solo') { menuView = 'solo'; renderMenu(); }
   else if (act === 'home') { menuView = 'home'; renderMenu(); }
-  else if (act === 'pick') { savePrefs({ mode: a.dataset.mode }); renderMenu(); }
+  else if (act === 'pick') { savePrefs({ mode: a.dataset.mode, maxDeals: +$('selDeals').value, speed: $('selSpeed').value }); renderMenu(); }
   else if (act === 'rules') showRules();
   else if (act === 'settings') showSettings();
   else if (act === 'resume') { if (ctrl.resume()) showGame(); }
@@ -86,7 +119,7 @@ $('menu').addEventListener('click', e => {
     savePrefs({ maxDeals: +$('selDeals').value, speed: $('selSpeed').value });
     ctrl.start({
       mode: prefs.mode, maxDeals: prefs.maxDeals, speed: prefs.speed,
-      players: [{ name: null, kind: 'human' }, ...AI_NAMES.map(name => ({ name, kind: 'ai' }))]
+      players: [{ name: null, kind: 'human' }, ...AI_NAMES.map((name, i) => ({ name, kind: 'ai', ai: { ...prefs.aiSeats[i] } }))]
     });
     showGame();
   }

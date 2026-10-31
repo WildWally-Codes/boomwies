@@ -35,6 +35,15 @@ a{color:var(--brass)}
 .menu-btn:disabled{opacity:.5;cursor:default}
 .soon{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--brass-dim);color:var(--brass);border-radius:20px;padding:2px 8px;flex:none}
 .menu-body .sheet-h{font-family:var(--f-display);font-weight:400;color:var(--chalk);font-size:1.5rem;margin:4px 0 0}
+.menu-h3{font-family:var(--f-display);font-weight:400;color:var(--chalk);font-size:1.1rem;margin:10px 0 0}
+.hint{font-size:.8rem;color:var(--chalk-dim);margin:2px 0;line-height:1.4}
+.seats{display:flex;flex-direction:column;gap:6px}
+.seatrow{display:grid;grid-template-columns:minmax(80px,1fr) minmax(0,1.3fr) minmax(0,1.3fr);gap:8px;align-items:center}
+.seatrow select{width:100%;min-width:0}
+.seatrow.head span{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+.seatname{font-weight:600}
+.seatname small,.seatname i{font-weight:400;color:var(--chalk-dim)}
+.chip.ai{text-transform:none;letter-spacing:0;font-weight:500}
 .menu-row{display:flex;gap:10px;flex-wrap:wrap}
 .menu-row .btn{flex:1 1 140px}
 .langtoggle{display:inline-flex;border:1px solid var(--brass-dim);border-radius:8px;overflow:hidden}

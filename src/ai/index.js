@@ -1,63 +1,106 @@
 // Computer player. Bidding uses hand estimates; card play samples possible deals of the
-// unseen cards (respecting known voids and publicly known cards) and plays each out with a
-// fast heuristic policy, choosing the card with the best average score.
+// unseen cards (respecting known voids, publicly known cards and, at higher levels, what
+// the bidding revealed) and plays each out, choosing the card with the best risk-adjusted score.
 // Only public information plus the AI's own hand is used.
 import { suitOf, rankOf, mk, shuffle, minBy, maxBy } from '../engine/cards.js';
 import { legal, beats, winnerOf } from '../engine/rules.js';
 import { isMis, sideTricks, scoreW, scoreB } from '../engine/scoring.js';
 import { bidOptions } from '../engine/game.js';
 import { est, bestSuit, misRisk } from './evaluate.js';
+import { aiParams } from './config.js';
+import { simBidBoomke, simEvWiezen } from './bidsim.js';
 
-export function chooseAction(G, p) {
-  const H = G.hand;
-  if (H.phase === 'bid') return { type: 'bid', seat: p, bid: G.mode === 'wiezen' ? bidW(G, p) : bidB(G, p) };
-  if (H.phase === 'alone') return { type: 'alone', seat: p, yes: est(H.hands[p], suitOf(H.turnCard)) >= 5.2 };
+const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) * 1.15;
+
+/** Picks the next action for seat p. settings = {level, aggression}; defaults to the seat's own. */
+export function chooseAction(G, p, settings = G.players[p].ai) {
+  const H = G.hand, P = aiParams(settings);
+  if (H.phase === 'bid') return { type: 'bid', seat: p, bid: G.mode === 'wiezen' ? bidW(G, p, P) : bidB(G, p, P) };
+  if (H.phase === 'alone') {
+    const v = est(H.hands[p], suitOf(H.turnCard)) + P.bidShift + gauss() * P.bidNoise;
+    return { type: 'alone', seat: p, yes: v >= 5.2 };
+  }
   if (H.phase === 'trump') return { type: 'trump', seat: p, suit: bestSuit(H.hands[p]).s };
-  if (H.phase === 'play') return { type: 'play', seat: p, card: chooseCard(G, p) };
+  if (H.phase === 'play') return { type: 'play', seat: p, card: chooseCard(G, p, P) };
   return null;
 }
 
 // ---------------- bidding ----------------
-function bidW(G, p) {
+function bidW(G, p, P) {
   const H = G.hand, hand = H.hands[p], opts = bidOptions(G, p);
-  const T0 = est(hand, suitOf(H.turnCard)), Tb = bestSuit(hand).v;
+  const noise = () => gauss() * P.bidNoise;
+  const T0 = est(hand, suitOf(H.turnCard)) + P.bidShift + noise();
+  const Tb = bestSuit(hand).v + P.bidShift + noise();
+  const misAllow = Math.max(0, 1 + 0.6 * P.aggr);
   const want = [];
   if (T0 >= 12.5) want.push('soloslim');
   if (Tb >= 12.3) want.push('solo');
-  if (misRisk(hand, true) === 0) want.push('openmis');
+  if (P.miserie && misRisk(hand, true) <= Math.max(0, 0.4 * P.aggr)) want.push('openmis');
   if (Tb >= 11.6) want.push('abon12');
-  if (misRisk(hand, false) <= 1) want.push('miserie');
+  if (P.miserie && misRisk(hand, false) <= misAllow) want.push('miserie');
   if (Tb >= 10.6) want.push('abon11');
   if (Tb >= 9.6) want.push('abon10');
   if (Tb >= 8.6) want.push('abon9');
   if (T0 >= 3.4) want.push('mee');
   if (T0 >= 3.9) want.push('vraag');
-  for (const k of want) if (opts.includes(k)) return k;
+  const offered = want.filter(k => opts.includes(k));
+  // Stronger levels play out sample deals and drop solo contracts that lose on average.
+  const solos = P.simBid ? offered.filter(k => k !== 'vraag' && k !== 'mee') : [];
+  const ev = solos.length ? simEvWiezen(G, p, solos, P) : {};
+  for (const k of offered) if (!(k in ev) || ev[k] > -0.5 * P.aggr) return k;
   return 'pass';
 }
 
-function bidB(G, p) {
+function bidB(G, p, P) {
   const H = G.hand, A = H.A, opts = bidOptions(G, p), partner = (p + 2) % 4;
+  if (P.simBid) return simBidBoomke(H.hands[p], p, opts, P, A.cur ? A.cur.level : 0, !!A.cur && A.cur.bidder === partner);
   const own = bestSuit(H.hands[p]).v;
   const pb = H.bids[partner];
   let bonus = 2.6;
-  if (pb != null && pb !== 'pass') bonus += ((A.cur && A.cur.bidder === partner ? A.cur.level : 7) - 6) * 0.5;
-  if (pb === 'pass') bonus -= 0.7;
-  const team = own + bonus;
-  if (opts.includes('meetje')) return team >= 12.6 ? 13 : 'meetje';
-  if (A.cur && A.cur.bidder === partner) return 'pass';
-  if (team >= 12.6 && opts.includes(13)) return 13;
+  if (pb != null && pb !== 'pass') bonus += ((A.cur && A.cur.bidder === partner ? A.cur.level : 7) - 6) * (P.infer ? 0.6 : 0.5);
+  if (pb === 'pass') bonus -= P.infer ? 0.9 : 0.7;
+  const team = own + bonus + P.bidShift + gauss() * P.bidNoise;
+  const boomAt = 12.6 - 0.4 * P.aggr;
+  if (opts.includes('meetje')) {
+    if (team >= boomAt) return 13;
+    return P.aggr >= 2 && team >= 8 ? 7 : 'meetje';
+  }
+  if (A.cur && A.cur.bidder === partner && P.aggr < 2) return 'pass';
+  if (team >= boomAt && opts.includes(13)) return 13;
   const min = A.cur ? A.cur.level + 1 : 7;
   if (min <= 12 && Math.floor(team) >= min) return min;
   return 'pass';
 }
 
 // ---------------- card play ----------------
-function makeCtx(G) {
-  const H = G.hand, C = H.contract, mode = G.mode;
+function ctxFrom(mode, C, smart) {
   const side = p => (mode !== 'wiezen' ? p % 2 : p === C.bidder || p === C.partner ? 0 : 1);
   const goal = p => (mode === 'wiezen' && isMis(C.k) ? (p === C.bidder ? 'avoid' : 'push') : 'take');
-  return { mode, C, side, goal };
+  return { mode, C, side, goal, smart };
+}
+const makeCtx = (G, P) => ctxFrom(G.mode, G.hand.contract, P.smart);
+
+/** Plays a whole deal from scratch with the playout policy; returns tricks per seat. Used by bidding simulations. */
+export function playout({ mode, C, smart }, deal, leader, trump, first) {
+  const ctx = ctxFrom(mode, C, smart), hands = deal.map(h => h.slice()), tr = [0, 0, 0, 0], played = new Uint8Array(52);
+  let trick = [], cur = leader;
+  let card = first ?? policy(ctx, cur, hands[cur], trick, trump, played);
+  for (;;) {
+    const h = hands[cur];
+    h.splice(h.indexOf(card), 1);
+    played[card] = 1;
+    trick.push({ p: cur, c: card });
+    if (trick.length === 4) {
+      const w = winnerOf(trick, trump);
+      tr[w]++;
+      trick = [];
+      cur = w;
+      if (!hands[w].length) break;
+    } else cur = (cur + 1) % 4;
+    card = policy(ctx, cur, hands[cur], trick, trump, played);
+  }
+  return tr;
 }
 
 function isTop(c, hand, played) {
@@ -87,6 +130,12 @@ function policy(ctx, p, hand, trick, trump, played) {
     const win = leg.filter(c => beats(c, wc, trump));
     if (win.length) {
       if (trick.length === 3 || !following) return minBy(win, c => (suitOf(c) === trump ? 100 : 0) + rankOf(c));
+      if (ctx.smart) {
+        // Win cheaply with a sure winner; otherwise second hand plays low, third hand covers.
+        const sure = win.filter(c => isTop(c, hand, played));
+        if (sure.length) return minBy(sure, rankOf);
+        if (trick.length === 1) return lowDiscard(leg, trump);
+      }
       return maxBy(win, rankOf);
     }
     return lowDiscard(leg, trump);
@@ -112,7 +161,26 @@ function utility(ctx, p, tr) {
   return mine * 2 - 13;
 }
 
-function sampleHands(H, p) {
+// How much more (or less) likely card c is in seat q's hand, given the bidding.
+function makeBias(G) {
+  const H = G.hand, C = H.contract, trump = H.trump;
+  return (q, c) => {
+    if (!C) return 1;
+    const s = suitOf(c), r = rankOf(c);
+    if (G.mode === 'wiezen') {
+      if (q === C.bidder && isMis(C.k)) return r >= 11 ? 0.6 : r <= 6 ? 1.3 : 1;
+      if (q === C.bidder && (C.k.startsWith('abon') || C.k === 'solo' || C.k === 'soloslim')) return s === trump ? 1.6 : r >= 12 ? 1.2 : 1;
+      if ((q === C.bidder || q === C.partner) && C.k === 'vraag') return r >= 12 ? 1.15 : 1;
+      return 1;
+    }
+    if (G.mode === 'boomke' && C.k === 'bid' && trump != null) {
+      if (q === C.bidder) return s === trump ? (C.level >= 9 ? 1.6 : 1.4) : 1;
+    }
+    return 1;
+  };
+}
+
+function sampleHands(H, p, P, bias) {
   const mine = H.hands[p], used = new Set([...mine, ...H.played]);
   const base = [[], [], [], []], need = [0, 0, 0, 0];
   base[p] = mine.slice();
@@ -124,18 +192,21 @@ function sampleHands(H, p) {
   const pool = [];
   for (let c = 0; c < 52; c++) if (!used.has(c)) pool.push(c);
   for (let attempt = 0; attempt < 14; attempt++) {
-    const useVoids = attempt < 12;
+    const useVoids = P.voids && attempt < 12;
     shuffle(pool);
     const h = base.map(x => x.slice()), left = need.slice();
     let ok = true;
     for (const c of pool) {
       const s = suitOf(c);
       let tot = 0;
-      const el = [];
-      for (let q = 0; q < 4; q++) if (q !== p && left[q] > 0 && !(useVoids && H.voids[q][s])) { el.push(q); tot += left[q]; }
+      const el = [], w = [];
+      for (let q = 0; q < 4; q++) if (q !== p && left[q] > 0 && !(useVoids && H.voids[q][s])) {
+        const wq = left[q] * (bias ? bias(q, c) : 1);
+        el.push(q); w.push(wq); tot += wq;
+      }
       if (!el.length) { ok = false; break; }
-      let r = Math.random() * tot, pick = el[0];
-      for (const q of el) { r -= left[q]; if (r <= 0) { pick = q; break; } }
+      let r = Math.random() * tot, pick = el[el.length - 1];
+      for (let i = 0; i < el.length; i++) { r -= w[i]; if (r <= 0) { pick = el[i]; break; } }
       h[pick].push(c);
       left[pick]--;
     }
@@ -166,23 +237,77 @@ function simulate(ctx, H, p, m, deal) {
   return utility(ctx, p, tr);
 }
 
-export function chooseCard(G, p) {
+// Exact play-out of a small endgame with all hands known (one sampled deal).
+function exact(ctx, p, hands, trick, tr, trump, cur) {
+  if (!hands[cur].length) return utility(ctx, p, tr);
+  const leg = legal(hands[cur], trick), maxi = ctx.side(cur) === ctx.side(p);
+  let best = maxi ? -Infinity : Infinity;
+  for (const c of leg) {
+    const h = hands[cur], i = h.indexOf(c);
+    h.splice(i, 1);
+    trick.push({ p: cur, c });
+    let v;
+    if (trick.length === 4) {
+      const w = winnerOf(trick, trump), saved = trick.splice(0, 4);
+      tr[w]++;
+      v = exact(ctx, p, hands, trick, tr, trump, w);
+      tr[w]--;
+      trick.push(...saved);
+    } else v = exact(ctx, p, hands, trick, tr, trump, (cur + 1) % 4);
+    trick.pop();
+    h.splice(i, 0, c);
+    if (maxi ? v > best : v < best) best = v;
+  }
+  return best;
+}
+
+function exactFirst(ctx, H, p, m, deal) {
+  const hands = deal.map(h => h.slice()), tr = H.tricks.slice(), trick = H.trick.slice();
+  const h = hands[p];
+  h.splice(h.indexOf(m), 1);
+  trick.push({ p, c: m });
+  let cur = (p + 1) % 4;
+  if (trick.length === 4) { const w = winnerOf(trick, H.trump); tr[w]++; trick.length = 0; cur = w; }
+  return exact(ctx, p, hands, trick, tr, H.trump, cur);
+}
+
+export function chooseCard(G, p, P = aiParams(G.players[p].ai)) {
   const H = G.hand, hand = H.hands[p], leg = legal(hand, H.trick);
   if (leg.length === 1) return leg[0];
+  if (P.noise && Math.random() < P.noise) return leg[(Math.random() * leg.length) | 0];
   // Boomke: the first lead names trump, so lead the top card of the strongest suit.
   if (H.trump == null && G.mode === 'boomke' && !H.trick.length) {
     const s = bestSuit(hand).s;
     return maxBy(hand.filter(c => suitOf(c) === s), rankOf);
   }
-  const ctx = makeCtx(G);
-  const tot = new Array(leg.length).fill(0);
-  const N = Math.max(24, Math.min(70, Math.round(900 / leg.length)));
-  for (let i = 0; i < N; i++) {
-    const deal = sampleHands(H, p);
-    if (!deal) continue;
-    leg.forEach((m, j) => (tot[j] += simulate(ctx, H, p, m, deal)));
+  const ctx = makeCtx(G, P);
+  if (!P.samples) {
+    const played = new Uint8Array(52);
+    H.played.forEach(c => (played[c] = 1));
+    return policy(ctx, p, hand, H.trick, H.trump, played);
   }
-  let bj = 0;
-  tot.forEach((v, j) => { if (v > tot[bj] + 1e-9) bj = j; });
+  const bias = P.infer ? makeBias(G) : null;
+  const useExact = P.endgame && hand.length <= 3;
+  const n = useExact ? Math.min(P.samples, 50) : Math.max(P.samples >> 2, Math.min(P.samples, Math.round(P.samples * 15 / leg.length)));
+  const sum = new Array(leg.length).fill(0), sq = new Array(leg.length).fill(0);
+  const t0 = now();
+  let done = 0;
+  for (let i = 0; i < n; i++) {
+    const deal = sampleHands(H, p, P, bias);
+    if (!deal) continue;
+    leg.forEach((m, j) => {
+      const v = useExact ? exactFirst(ctx, H, p, m, deal) : simulate(ctx, H, p, m, deal);
+      sum[j] += v; sq[j] += v * v;
+    });
+    done++;
+    if (P.maxMs && done >= 8 && now() - t0 > P.maxMs) break;
+  }
+  if (!done) return leg[0];
+  let bj = 0, bv = -Infinity;
+  leg.forEach((_, j) => {
+    const mean = sum[j] / done, sd = Math.sqrt(Math.max(0, sq[j] / done - mean * mean));
+    const v = mean + P.riskK * sd;
+    if (v > bv + 1e-9) { bv = v; bj = j; }
+  });
   return leg[bj];
 }

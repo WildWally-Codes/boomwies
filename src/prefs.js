@@ -1,6 +1,9 @@
 // Per-browser preferences. Storage can be unavailable (private mode), so every access is guarded.
 const KEY = 'boomwies-prefs';
-const DEFAULTS = { lang: 'en', sortDir: 'asc', trumpFirst: false, mode: 'wiezen', maxDeals: 12, speed: 'normal' };
+const DEFAULTS = {
+  lang: 'en', sortDir: 'asc', trumpFirst: false, mode: 'wiezen', maxDeals: 12, speed: 'normal',
+  aiSeats: [1, 2, 3].map(() => ({ level: 'club', aggression: 'balanced' }))
+};
 
 export const prefs = { ...DEFAULTS };
 try { Object.assign(prefs, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { /* defaults */ }

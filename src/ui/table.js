@@ -37,9 +37,13 @@ function nameplate(G, fmt, p) {
   const team = G.mode !== 'wiezen' ? `<span class="chip team">${t('chip.team', { x: p % 2 === 0 ? 'A' : 'B' })}</span>` : '';
   const showTricks = !BIDDING.includes(H.phase);
   const tr = H.tricks[p];
+  const pl = G.players[p];
+  const ai = pl.kind === 'ai' && pl.ai
+    ? `<span class="chip ai" title="${esc(t('setup.level') + ': ' + t('level.' + pl.ai.level) + ' · ' + t('setup.aggression') + ': ' + t('aggr.' + pl.ai.aggression))}">${t('level.' + pl.ai.level)} · ${t('aggr.' + pl.ai.aggression)}</span>`
+    : '';
   return `<div class="nameplate${turn ? ' turn' : ''}"><span class="nm">${fmt.name(p)}</span>` +
     (p === G.dealer ? `<span class="chip dealer">${t('chip.dealer')}</span>` : '') + team + roleChip(G, fmt, p) +
-    (showTricks ? `<span class="tricks">${tr === 1 ? t('tricks.1') : t('tricks.n', { n: tr })}</span>` : '') + '</div>';
+    (showTricks ? `<span class="tricks">${tr === 1 ? t('tricks.1') : t('tricks.n', { n: tr })}</span>` : '') + ai + '</div>';
 }
 
 const bubble = (G, fmt, p) => (BIDDING.includes(G.hand.phase) ? fmt.bidLabel(G.hand.bids[p]) : '');

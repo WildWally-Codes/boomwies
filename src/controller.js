@@ -1,6 +1,6 @@
 // Runs a local game: applies actions, schedules computer moves and automatic steps, and saves progress.
 import { createGame, applyAction, waitingFor } from './engine/game.js';
-import { chooseAction } from './ai/index.js';
+import { requestAiAction } from './ai/client.js';
 import { loadJSON, saveJSON } from './prefs.js';
 
 const SAVE_KEY = 'boomwies-game';
@@ -12,6 +12,7 @@ export class Controller {
     this.G = null;
     this.speed = 'normal';
     this.timer = null;
+    this.version = 0;
   }
 
   static savedGame() {
@@ -34,7 +35,7 @@ export class Controller {
     return true;
   }
 
-  stop() { clearTimeout(this.timer); this.timer = null; }
+  stop() { clearTimeout(this.timer); this.timer = null; this.version++; }
 
   dispatch(action) {
     try { applyAction(this.G, action); }
@@ -44,6 +45,7 @@ export class Controller {
   }
 
   afterChange() {
+    this.version++;
     saveJSON(SAVE_KEY, this.G.phase === 'over' ? null : { G: this.G, speed: this.speed });
     this.schedule();
     this.onChange(this.G);
@@ -58,7 +60,12 @@ export class Controller {
     if (H.phase === 'redeal') { this.timer = setTimeout(() => this.dispatch({ type: 'redeal' }), 1900); return; }
     const w = waitingFor(G);
     if (w != null && G.players[w].kind === 'ai') {
-      this.timer = setTimeout(() => this.dispatch(chooseAction(G, w)), aiDelay);
+      // Think in the background; act after at least the speed delay, and only if nothing changed meanwhile.
+      const version = this.version;
+      const delay = new Promise(r => { this.timer = setTimeout(r, aiDelay); });
+      Promise.all([requestAiAction(G, w), delay]).then(([action]) => {
+        if (this.version === version && this.G === G && action) this.dispatch(action);
+      }).catch(err => console.error('Computer player failed', err));
     }
   }
 }

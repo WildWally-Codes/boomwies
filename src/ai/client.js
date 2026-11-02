@@ -6,6 +6,8 @@ const pending = new Map();
 
 function getWorker() {
   if (worker !== null) return worker;
+  // The single-file artifact build has no separate worker file; think on the main thread there.
+  if (__ARTIFACT__ || typeof Worker === 'undefined') return (worker = false);
   try {
     worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
     worker.onmessage = ({ data }) => {

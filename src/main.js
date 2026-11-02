@@ -113,7 +113,8 @@ function renderMenu() {
     return;
   }
   // home
-  const solo = Controller.savedGame(), hosted = HostSession.saved(), last = loadJSON(LAST_TABLE_KEY);
+  // The Claude artifact build is single-player only: it cannot open outside network connections.
+  const solo = Controller.savedGame(), hosted = __ARTIFACT__ ? null : HostSession.saved(), last = __ARTIFACT__ ? null : loadJSON(LAST_TABLE_KEY);
   const big = (actName, title, desc, primary) => `<button type="button" class="menu-btn${primary ? ' primary' : ''}" data-act="${actName}"><div><b>${title}</b><span>${desc}</span></div></button>`;
   const dealTxt = G => `${t('mode.' + G.mode)} · ${t('status.dealOf', { n: G.dealNo, m: G.maxDeals || '∞' })}`;
   body.innerHTML = `
@@ -121,8 +122,7 @@ function renderMenu() {
     ${hosted ? big('resumeHost', t('menu.resumeHost', { code: esc(hosted.lobby.code) }), dealTxt(hosted.G), !solo) : ''}
     ${last ? big('rejoin', t('menu.rejoin', { code: esc(last.code) }), t('menu.rejoinDesc'), !solo && !hosted) : ''}
     ${big('solo', t('menu.solo'), t('menu.soloDesc'), !solo && !hosted && !last)}
-    ${big('host', t('menu.host'), t('menu.hostDesc'))}
-    ${big('join', t('menu.join'), t('menu.joinDesc'))}
+    ${__ARTIFACT__ ? `<p class="hint">${t('menu.artifactNote')}</p>` : big('host', t('menu.host'), t('menu.hostDesc')) + big('join', t('menu.join'), t('menu.joinDesc'))}
     <div class="menu-row">
       <button type="button" class="btn" data-act="rules">${t('menu.rules')}</button>
       <button type="button" class="btn" data-act="settings">${t('menu.settings')}</button>
@@ -461,7 +461,7 @@ setLang(prefs.lang);
 applyStaticText();
 showMenu();
 const params = new URLSearchParams(location.search);
-if (params.get('join')) {
+if (!__ARTIFACT__ && params.get('join')) {
   joinCode = normalizeCode(params.get('join'));
   history.replaceState(null, '', location.pathname);
   menuView = 'join';

@@ -43,9 +43,10 @@ describe('host session', () => {
     expect(JSON.stringify(a.sent)).not.toContain('tok-b');  // tokens never leave the host
 
     // Bert cannot act for Anna's seat, even by naming it.
-    const before = JSON.stringify(h.G.hand);
+    const before = JSON.stringify(h.G.hand), bertsTurn = h.G.hand.turn === 2;
     h.receive(b, { t: 'action', action: { type: 'bid', seat: 3, bid: 'pass' } });
-    if (h.G.hand.turn !== 2) expect(JSON.stringify(h.G.hand)).toBe(before);
+    if (bertsTurn) expect(h.G.hand.bids[2]).toBe('pass');   // treated as Bert's own move
+    else expect(JSON.stringify(h.G.hand)).toBe(before);
   });
 
   it('a late stranger is refused, a returning token gets its seat back', () => {

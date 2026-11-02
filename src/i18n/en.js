@@ -24,6 +24,7 @@ export default {
   'menu.join': 'Join a table',
   'menu.soon': 'Coming soon',
   'menu.resume': 'Resume game',
+  'menu.artifactNote': 'This version is single-player. Playing with friends works on the full site.',
   'menu.hostDesc': 'Play with friends; computer players fill empty seats.',
   'menu.joinDesc': 'Enter a table code or open an invite link.',
   'menu.resumeHost': 'Resume your table {code}',

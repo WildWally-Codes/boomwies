@@ -1,0 +1,49 @@
+name: Test and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+        env:
+          # Optional: set these as repository secrets to add a TURN relay or a self-hosted broker.
+          VITE_TURN_URL: ${{ secrets.VITE_TURN_URL }}
+          VITE_TURN_USER: ${{ secrets.VITE_TURN_USER }}
+          VITE_TURN_PASS: ${{ secrets.VITE_TURN_PASS }}
+          VITE_PEER_HOST: ${{ secrets.VITE_PEER_HOST }}
+          VITE_PEER_PORT: ${{ secrets.VITE_PEER_PORT }}
+          VITE_PEER_PATH: ${{ secrets.VITE_PEER_PATH }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

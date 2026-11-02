@@ -77,7 +77,7 @@ export class HostSession {
   }
 
   receive(conn, msg) {
-    if (!msg || typeof msg !== 'object') return;
+    if (this.closed || !msg || typeof msg !== 'object') return;
     const info = this.conns.get(conn.peer);
     if (msg.t === 'hello') return this.hello(conn, msg);
     if (!info) return;
@@ -124,6 +124,7 @@ export class HostSession {
 
   /** Guest left (bye) or the connection dropped. */
   dropped(conn) {
+    if (this.closed) return; // closing the table drops every connection; nothing more to record
     const info = this.conns.get(conn.peer);
     if (!info) return;
     this.conns.delete(conn.peer);
@@ -201,7 +202,8 @@ export class HostSession {
     this.ctrl.stop();
     Object.values(this.graceTimers).forEach(clearTimeout);
     for (const { conn } of this.conns.values()) { if (end && conn.open) conn.send({ t: 'end' }); }
-    if (end) saveJSON(HOST_SAVE, null);
+    this.conns.clear();
+    if (end) { this.ctrl.saveKey = null; saveJSON(HOST_SAVE, null); }
     setTimeout(() => this.peer && this.peer.destroy(), end ? 300 : 0);
   }
 }

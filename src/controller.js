@@ -50,7 +50,7 @@ export class Controller {
 
   afterChange() {
     this.version++;
-    saveJSON(this.saveKey, this.G.phase === 'over' ? null : { G: this.G, speed: this.speed, ...(this.extra ? this.extra() : {}) });
+    if (this.saveKey) saveJSON(this.saveKey,this.G.phase === 'over' ? null : { G: this.G, speed: this.speed, ...(this.extra ? this.extra() : {}) });
     this.schedule();
     this.onChange(this.G);
   }

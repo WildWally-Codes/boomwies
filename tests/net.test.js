@@ -73,6 +73,22 @@ describe('host session', () => {
     expect(a2.last('state').seat).toBe(1);
   });
 
+  it('ignores guest disconnects after the table was ended', () => {
+    const h = makeHost();
+    h.peer = { destroy() {} };
+    const a = fakeConn('a');
+    h.accept(a);
+    h.receive(a, { t: 'hello', name: 'Anna', token: 'tok-a' });
+    h.start();
+    h.close(true);
+    expect(a.last('end')).toBeTruthy();
+    const spy = vi.spyOn(h.ctrl, 'afterChange');
+    a.handlers.close();                    // the guest's connection drops as the table closes
+    vi.advanceTimersByTime(120000);
+    expect(spy).not.toHaveBeenCalled();     // nothing re-saves or re-schedules the ended game
+    expect(h.G.players[1].offline).toBeFalsy();
+  });
+
   it('a guest can play a legal card on their turn', () => {
     const h = makeHost('klassiek');
     const a = fakeConn('a');

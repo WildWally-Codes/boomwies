@@ -19,9 +19,14 @@ export function est(hand, trump) {
   return t;
 }
 
+// Best trump suit among the suits actually held (a void suit can tie on honour points alone).
 export function bestSuit(hand) {
-  let b = 0, bv = -1;
-  for (let s = 0; s < 4; s++) { const v = est(hand, s); if (v > bv) { bv = v; b = s; } }
+  let b = hand.length ? suitOf(hand[0]) : 0, bv = -1;
+  for (let s = 0; s < 4; s++) {
+    if (hand.length && !hand.some(c => suitOf(c) === s)) continue;
+    const v = est(hand, s);
+    if (v > bv) { bv = v; b = s; }
+  }
   return { s: b, v: bv };
 }
 

@@ -210,7 +210,8 @@ function sampleHands(H, p, P, bias) {
       h[pick].push(c);
       left[pick]--;
     }
-    if (ok) return h;
+    // Only accept a deal that gives every seat exactly as many cards as it really holds.
+    if (ok && h.every((x, q) => x.length === H.hands[q].length)) return h;
   }
   return null;
 }
@@ -232,6 +233,7 @@ function simulate(ctx, H, p, m, deal) {
       cur = w;
       if (!hands[w].length) break;
     } else cur = (cur + 1) % 4;
+    if (!hands[cur].length) break; // inconsistent sample: score what was played so far
     card = policy(ctx, cur, hands[cur], trick, trump, played);
   }
   return utility(ctx, p, tr);
@@ -304,10 +306,76 @@ export function chooseCard(G, p, P = aiParams(G.players[p].ai)) {
   }
   if (!done) return leg[0];
   let bj = 0, bv = -Infinity;
-  leg.forEach((_, j) => {
+  const vals = leg.map((_, j) => {
     const mean = sum[j] / done, sd = Math.sqrt(Math.max(0, sq[j] / done - mean * mean));
     const v = mean + P.riskK * sd;
     if (v > bv + 1e-9) { bv = v; bj = j; }
+    return v;
   });
+  if (P.signals) {
+    const sig = signalChoice(G, ctx, p, leg, vals, bv);
+    if (sig != null) return sig;
+  }
   return leg[bj];
+}
+
+// ---------------- partner signals ----------------
+// Convention: when you cannot follow suit, your first discard is a low card of the suit you
+// want your partner to lead. Partners read that discard when they next lead.
+const SIGNAL_COST = 0.25; // largest expected loss (in points) accepted to send or follow a signal
+
+const partnersOf = (ctx, p) => [0, 1, 2, 3].filter(q => q !== p && ctx.side(q) === ctx.side(p));
+
+/** A suit worth asking for: not trump, held at least twice, headed by a sure winner or K-Q. */
+export function wantedSuit(hand, trump, played) {
+  let best = null, bestScore = 0;
+  for (let s = 0; s < 4; s++) {
+    if (s === trump) continue;
+    const cards = hand.filter(c => suitOf(c) === s);
+    if (cards.length < 2) continue;
+    const top = maxBy(cards, rankOf);
+    let score = isTop(top, hand, played) ? 3 : rankOf(top) === 13 && cards.some(c => rankOf(c) === 12) ? 2 : 0;
+    if (!score) continue;
+    score += cards.length * 0.2;
+    if (score > bestScore) { bestScore = score; best = s; }
+  }
+  return best;
+}
+
+/** The suit seat p's partner asked for with their first discard this deal, or null. */
+export function partnerSignal(H, partners) {
+  for (const d of H.discards || []) {
+    if (!partners.includes(d.p)) continue;
+    if (suitOf(d.c) === H.trump || rankOf(d.c) > 9) return null; // a trump or high card is not a signal
+    return suitOf(d.c);
+  }
+  return null;
+}
+
+function signalChoice(G, ctx, p, leg, vals, bv) {
+  const H = G.hand;
+  if (ctx.goal(p) !== 'take') return null;
+  const partners = partnersOf(ctx, p);
+  if (!partners.length) return null;
+  const pickFrom = cards => {
+    let best = null, v = -Infinity;
+    for (const c of cards) { const j = leg.indexOf(c); if (vals[j] > v) { v = vals[j]; best = c; } }
+    return best != null && v >= bv - SIGNAL_COST ? best : null;
+  };
+  if (!H.trick.length) {
+    // Leading: follow partner's request when it costs (almost) nothing.
+    const s = partnerSignal(H, partners);
+    return s == null ? null : pickFrom(leg.filter(c => suitOf(c) === s));
+  }
+  const ledSuit = suitOf(H.trick[0].c);
+  const discarding = !leg.some(c => suitOf(c) === ledSuit);
+  const alreadyDiscarded = (H.discards || []).some(d => d.p === p);
+  if (!discarding || alreadyDiscarded) return null;
+  const played = new Uint8Array(52);
+  H.played.forEach(c => (played[c] = 1));
+  const s = wantedSuit(H.hands[p], H.trump, played);
+  if (s == null) return null;
+  const low = minBy(leg.filter(c => suitOf(c) === s), rankOf);
+  if (rankOf(low) > 9) return null; // too high to read as a signal
+  return vals[leg.indexOf(low)] >= bv - SIGNAL_COST ? low : null;
 }

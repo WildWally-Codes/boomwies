@@ -284,6 +284,8 @@ export default {
     <tr><td>Boom (13)</td><td>+5</td><td>bidders −5, opponents +5; play stops at the first lost trick</td></tr></table></div>
   <h3>Classic Boomke</h3>
   <p>No bidding: the turned card sets trump, the player left of the dealer leads, and each team scores one point per trick.</p>
+  <h3>Signals from computer partners</h3>
+  <p>Club player, Expert and Master partners signal: when they cannot follow suit, their first discard is a low card (9 or lower) of the suit they want you to lead, usually one where they hold the ace or king-queen. They also read your first low discard the same way when they lead.</p>
   <h3>Sources</h3>
   <p>Boomkewies follows <a href="https://www.pagat.com/auctionwhist/boomke-wies.html" target="_blank" rel="noopener">pagat.com</a>. Wiezen scoring follows <a href="https://www.thegameroom.org/wiezen/" target="_blank" rel="noopener">thegameroom.org</a>; where that page gives no number (failed contracts, the bid order) common café values are used. Piccolo, tremerie, kleine miserie with discards and shared miserie are not included.</p>`
 };

@@ -41,7 +41,7 @@ export function startDeal(G, rng = Math.random) {
     hands, turnCard, trump: null, contract: null, phase: 'bid', turn: (G.dealer + 1) % 4,
     trick: [], leader: null, tricks: [0, 0, 0, 0], played: [],
     voids: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
-    known: [[], [], [], []], lastTrick: null, revealed: null,
+    known: [[], [], [], []], lastTrick: null, revealed: null, discards: [],
     bids: [null, null, null, null],
     A: { cur: null, passed: [false, false, false, false] },
     events: [], result: null, pendingLeader: null
@@ -80,7 +80,7 @@ function checkTroel(H) {
     }
     const partner = [0, 1, 2, 3].find(q => H.hands[q].includes(card));
     H.A.cur = { k: 'troel', rank: 15, bidder: p, partner, trump, need, name, card };
-    H.known[partner].push(card);
+    if (!H.known[partner].includes(card)) H.known[partner].push(card); // may already be the turned card
     H.bids[p] = name; H.bids[partner] = 'partner';
     ev(H, { e: 'troel', p, partner, name, card, trump, aces: aces.length });
     return;
@@ -189,7 +189,14 @@ export function legalCards(G, p) {
 
 function playCard(G, p, c) {
   const H = G.hand, hand = H.hands[p];
-  if (H.trick.length) { const ls = suitOf(H.trick[0].c); if (suitOf(c) !== ls) H.voids[p][ls] = 1; }
+  if (H.trick.length) {
+    const ls = suitOf(H.trick[0].c);
+    if (suitOf(c) !== ls) {
+      H.voids[p][ls] = 1;
+      // Discards are public; partners read the first one as a signal for the suit to lead.
+      (H.discards || (H.discards = [])).push({ p, c, trump: H.trump });
+    }
+  }
   if (!H.trick.length && H.trump == null && G.mode === 'boomke') {
     H.trump = suitOf(c); H.contract.trump = H.trump;
     ev(H, { e: 'leadTrump', p, c });

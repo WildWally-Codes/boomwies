@@ -284,6 +284,8 @@ export default {
     <tr><td>Boom (13)</td><td>+5</td><td>bieders −5, tegenspelers +5; het spel stopt bij de eerste verloren slag</td></tr></table></div>
   <h3>Klassiek Boomke</h3>
   <p>Zonder bieden: de omgedraaide kaart bepaalt troef, de speler links van de gever komt uit en elke ploeg krijgt één punt per slag.</p>
+  <h3>Seinen van computerpartners</h3>
+  <p>Clubspelers, experts en meesters geven seinen: als ze geen kleur kunnen bekennen, is hun eerste afgooi een lage kaart (9 of lager) van de kleur die ze willen dat jij uitkomt, meestal een kleur met de aas of heer-vrouw. Ze lezen jouw eerste lage afgooi op dezelfde manier als zij uitkomen.</p>
   <h3>Bronnen</h3>
   <p>Boomkewies volgt <a href="https://www.pagat.com/auctionwhist/boomke-wies.html" target="_blank" rel="noopener">pagat.com</a>. De telling bij Wiezen volgt <a href="https://www.thegameroom.org/wiezen/" target="_blank" rel="noopener">thegameroom.org</a>; waar die pagina geen getal geeft (niet gehaalde spellen, de biedvolgorde) worden gangbare cafégetallen gebruikt. Piccolo, tremerie, kleine miserie met afleggen en gedeelde miserie zitten er niet in.</p>`
 };

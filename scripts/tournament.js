@@ -30,7 +30,9 @@ const PRESETS = {
   'expert-infer': { level: 'expert', tune: { infer: false } },
   'expert-both': { level: 'expert', tune: { smart: false, infer: false } },
   'expert-bs48': { level: 'expert', tune: { bidSamples: 48 } },
-  'master-noinfer': { level: 'master', tune: { infer: false } }
+  'master-noinfer': { level: 'master', tune: { infer: false } },
+  'club-nosig': { level: 'club', tune: { signals: false } },
+  'expert-nosig': { level: 'expert', tune: { signals: false } }
 };
 const ai = (lv, aggression) => (lv.startsWith('{') ? { aggression, ...JSON.parse(lv) } : { aggression, ...(PRESETS[lv] || { level: lv }) });
 const [mode, ...rest] = process.argv.slice(2);

@@ -8,11 +8,12 @@ export const AGGRESSION = ['cautious', 'careful', 'balanced', 'bold', 'reckless'
 const LEVEL_PARAMS = {
   //           sampled deals, time cap, random-card chance, remembers voids, smarter playouts, reads bidding, exact endgame, bid estimate noise
   // simBid: price contracts by simulating sample deals instead of using hand estimates
-  beginner: { samples: 0, maxMs: 0, noise: 0.25, voids: false, smart: false, infer: false, endgame: false, bidNoise: 1.2, miserie: false, simBid: false },
-  casual: { samples: 12, maxMs: 150, noise: 0.06, voids: false, smart: false, infer: false, endgame: false, bidNoise: 0.6, miserie: true, simBid: false },
-  club: { samples: 60, maxMs: 400, noise: 0, voids: true, smart: false, infer: false, endgame: false, bidNoise: 0, miserie: true, simBid: false },
-  expert: { samples: 140, maxMs: 700, noise: 0, voids: true, smart: true, infer: true, endgame: false, bidNoise: 0, miserie: true, simBid: true, bidSamples: 32 },
-  master: { samples: 220, maxMs: 1000, noise: 0, voids: true, smart: true, infer: true, endgame: true, bidNoise: 0, miserie: true, simBid: true, bidSamples: 48 }
+  // signals: discard a low card of the suit it wants partner to lead, and read partner's discards
+  beginner: { samples: 0, maxMs: 0, noise: 0.25, voids: false, smart: false, infer: false, endgame: false, bidNoise: 1.2, miserie: false, simBid: false, signals: false },
+  casual: { samples: 12, maxMs: 150, noise: 0.06, voids: false, smart: false, infer: false, endgame: false, bidNoise: 0.6, miserie: true, simBid: false, signals: false },
+  club: { samples: 60, maxMs: 400, noise: 0, voids: true, smart: false, infer: false, endgame: false, bidNoise: 0, miserie: true, simBid: false, signals: true },
+  expert: { samples: 140, maxMs: 700, noise: 0, voids: true, smart: true, infer: true, endgame: false, bidNoise: 0, miserie: true, simBid: true, bidSamples: 32, signals: true },
+  master: { samples: 220, maxMs: 1000, noise: 0, voids: true, smart: true, infer: true, endgame: true, bidNoise: 0, miserie: true, simBid: true, bidSamples: 48, signals: true }
 };
 
 export const DEFAULT_AI = { level: 'club', aggression: 'balanced' };

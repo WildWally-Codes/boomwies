@@ -24,7 +24,7 @@ export default {
   'menu.join': 'Aan tafel gaan',
   'menu.soon': 'Binnenkort',
   'menu.resume': 'Spel hervatten',
-  'menu.artifactNote': 'Deze versie is enkel voor alleen spelen. Met vrienden spelen kan op de volledige site.',
+  'menu.artifactNote': 'Deze versie is enkel voor alleen spelen. Met vrienden spelen kan op de volledige site: <a href="https://wildwally-codes.github.io/boomwies/" target="_blank" rel="noopener">wildwally-codes.github.io/boomwies</a>',
   'menu.hostDesc': 'Speel met vrienden; computerspelers vullen lege plaatsen.',
   'menu.joinDesc': 'Geef een tafelcode in of open een uitnodigingslink.',
   'menu.resumeHost': 'Je tafel {code} hervatten',

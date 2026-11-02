@@ -24,7 +24,7 @@ export default {
   'menu.join': 'Join a table',
   'menu.soon': 'Coming soon',
   'menu.resume': 'Resume game',
-  'menu.artifactNote': 'This version is single-player. Playing with friends works on the full site.',
+  'menu.artifactNote': 'This version is single-player. To play with friends, open the full site: <a href="https://wildwally-codes.github.io/boomwies/" target="_blank" rel="noopener">wildwally-codes.github.io/boomwies</a>',
   'menu.hostDesc': 'Play with friends; computer players fill empty seats.',
   'menu.joinDesc': 'Enter a table code or open an invite link.',
   'menu.resumeHost': 'Resume your table {code}',

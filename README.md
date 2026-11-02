@@ -2,13 +2,16 @@
 
 Belgian whist card games in the browser: **Wiezen**, **Boomkewies** and **Classic Boomke**, alone against computer players or with up to three friends.
 
+**Play:** https://wildwally-codes.github.io/boomwies/
+
 ## Develop
 
 ```bash
 npm install
 npm run dev     # http://localhost:5173
 npm test        # engine, scoring and hand-sorting tests
-npm run build   # static site in dist/
+npm run build   # static site in dist/ (deployed to GitHub Pages on every push to main)
+npm run build:artifact   # single-player single-file page in artifact/ (for the Claude artifact)
 ```
 
 ## Multiplayer
@@ -29,6 +32,5 @@ Optional build-time settings (`.env` file or CI secrets):
 - `src/net/` – hosting and joining tables over PeerJS
 - `src/ui/` – table rendering, hand sorting and drag-to-reorder
 - `src/i18n/` – English and Nederlands strings
-- `wiezen.html` – the original single-file prototype (also published as a Claude artifact)
 
 Rules sources: [pagat.com – Boomke Wies](https://www.pagat.com/auctionwhist/boomke-wies.html), [thegameroom.org – Wiezen](https://www.thegameroom.org/wiezen/).
